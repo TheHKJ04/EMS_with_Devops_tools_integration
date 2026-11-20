@@ -1,6 +1,6 @@
 from flask import Flask
 from config import Config
-
+from flask_wtf.csrf import CSRFProtect
 from app.routes.employee import employee_bp
 from app.routes.department import department_bp
 from app.routes.home import home_bp
@@ -9,6 +9,7 @@ from app.models import db
 from flask_migrate import Migrate
 
 migrate = Migrate()
+csrf = CSRFProtect()
 
 
 def create_app(test_config=None):
@@ -26,7 +27,7 @@ def create_app(test_config=None):
 
     db.init_app(app)
     migrate.init_app(app, db)
-
+    csrf.init_app(app)
     app.register_blueprint(home_bp)
     app.register_blueprint(employee_bp)
     app.register_blueprint(department_bp)

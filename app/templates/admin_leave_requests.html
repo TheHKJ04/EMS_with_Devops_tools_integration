@@ -87,12 +87,14 @@
           <td>
             {% if request.status == 'Pending' %}
             <form method="POST" action="/employee/admin/leave-requests/{{ request.id }}/approve" class="d-flex flex-column gap-2">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <textarea class="form-control form-control-sm" name="message" rows="2" placeholder="Optional note for this update"></textarea>
               <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-sm btn-success">Approve</button>
               </div>
             </form>
             <form method="POST" action="/employee/admin/leave-requests/{{ request.id }}/disapprove" class="d-flex flex-column gap-2 mt-2">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <textarea class="form-control form-control-sm" name="message" rows="2" placeholder="Optional note for this update"></textarea>
               <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-sm btn-danger">Disapprove</button>

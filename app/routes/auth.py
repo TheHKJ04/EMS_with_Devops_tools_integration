@@ -65,7 +65,7 @@ def employee_login():
     return render_template('employee_login.html')
 
 
-@auth_bp.route('/logout')
+@auth_bp.route('/logout',methods=['POST'])
 def logout():
     session.clear()
     flash('You have been logged out', 'info')

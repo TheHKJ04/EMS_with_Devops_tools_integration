@@ -17,6 +17,7 @@
       <div class="card p-4 mb-4">
         <h5 class="fw-semibold">Apply for Leave</h5>
         <form method="POST" action="/employee/portal/leave" class="row g-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="col-md-6">
             <label class="form-label">Start Date</label>
             <input type="date" class="form-control" name="start_date" required>
@@ -37,6 +38,7 @@
       <div class="card p-4">
         <h5 class="fw-semibold">Mark Attendance</h5>
         <form method="POST" action="/employee/portal/attendance" class="row g-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="col-md-6">
             <label class="form-label">Date</label>
             <input type="date" class="form-control" name="attendance_date">

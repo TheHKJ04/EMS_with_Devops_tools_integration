@@ -467,7 +467,7 @@ def admin_leave_requests():
     )
 
 
-@employee_bp.route("/employee/admin/leave-requests/<int:request_id>/<string:action>", methods=["POST", "GET"])
+@employee_bp.route("/employee/admin/leave-requests/<int:request_id>/<string:action>", methods=["POST"])
 @login_required
 def update_leave_request(request_id, action):
     leave_request = LeaveRequest.query.get_or_404(request_id)
