@@ -1,0 +1,13 @@
+body{
+    background: rgb(177, 59, 83);
+}
+
+h1{
+    color:rgb(211, 225, 184);
+}
+
+table{
+    background-color: rgb(91, 139, 179);
+    border-width: 5px;
+    border-color: black;
+}

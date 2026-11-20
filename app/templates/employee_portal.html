@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card p-4">
+        <h4 class="fw-semibold">My Profile</h4>
+        <p class="mb-1"><strong>Name:</strong> {{ employee.name }}</p>
+        <p class="mb-1"><strong>Email:</strong> {{ employee.email }}</p>
+        <p class="mb-1"><strong>Department:</strong> {{ employee.department }}</p>
+        <p class="mb-1"><strong>Position:</strong> {{ employee.position }}</p>
+        <p class="mb-1"><strong>Status:</strong> {{ employee.status }}</p>
+      </div>
+    </div>
+    <div class="col-lg-8">
+      <div class="card p-4 mb-4">
+        <h5 class="fw-semibold">Apply for Leave</h5>
+        <form method="POST" action="/employee/portal/leave" class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-control" name="start_date" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">End Date</label>
+            <input type="date" class="form-control" name="end_date" required>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Reason</label>
+            <textarea class="form-control" name="reason" rows="3" required></textarea>
+          </div>
+          <div class="col-12">
+            <button class="btn btn-dark">Submit Leave Request</button>
+          </div>
+        </form>
+      </div>
+      <div class="card p-4">
+        <h5 class="fw-semibold">Mark Attendance</h5>
+        <form method="POST" action="/employee/portal/attendance" class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-control" name="attendance_date">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Status</label>
+            <select class="form-select" name="status">
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Notes</label>
+            <input type="text" class="form-control" name="notes">
+          </div>
+          <div class="col-12">
+            <button class="btn btn-dark">Mark Attendance</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-2">
+    <div class="col-lg-6">
+      <div class="card p-4">
+        <h5 class="fw-semibold">Leave Requests</h5>
+        <ul class="list-group list-group-flush">
+          {% for leave in leaves %}
+          <li class="list-group-item">
+            <strong>{{ leave.start_date }} to {{ leave.end_date }}</strong><br>
+            {{ leave.reason }}<br>
+            <span class="badge bg-info text-dark">{{ leave.status }}</span>
+          </li>
+          {% else %}
+          <li class="list-group-item">No leave requests yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card p-4">
+        <h5 class="fw-semibold">Attendance History</h5>
+        <ul class="list-group list-group-flush">
+          {% for record in attendance %}
+          <li class="list-group-item">
+            <strong>{{ record.attendance_date }}</strong> — {{ record.status }}
+            {% if record.notes %}({{ record.notes }}){% endif %}
+          </li>
+          {% else %}
+          <li class="list-group-item">No attendance marks yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

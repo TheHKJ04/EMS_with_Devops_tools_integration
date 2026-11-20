@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0"><i class="bi bi-person-vcard"></i> Employee Profile</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Employee ID</h6>
+                            <p class="fw-bold">#{{ employee.id }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Full Name</h6>
+                            <p class="fw-bold">{{ employee.name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Email</h6>
+                            <p><a href="mailto:{{ employee.email }}">{{ employee.email }}</a></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Department</h6>
+                            <p><span class="badge bg-info">{{ employee.department }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Position</h6>
+                            <p><span class="badge bg-secondary">{{ employee.position }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Status</h6>
+                            <p>{% if employee.status == 'Active' %}<span class="badge status-active">Active</span>{% else %}<span class="badge status-inactive">Inactive</span>{% endif %}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Date of Joining</h6>
+                            <p>{{ employee.date_of_joining }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Salary</h6>
+                            <p class="text-success fw-bold">₹ {{ "%.2f"|format(employee.salary) }}</p>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="/employee/employeeUpdate/{{ employee.id }}" class="btn btn-warning">Edit</a>
+                        <form action="/employee/employeeDelete/{{ employee.id }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this employee?')"><button type="submit" class="btn btn-danger">Delete</button></form>
+                        <a href="/employee/list" class="btn btn-outline-secondary">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.Python
+.venv/
+venv/
+env/
+
+# Environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# Flask / local runtime
+instance/
+web.log
+uploads/
+
+# Databases and generated artifacts
+*.db
+*.sqlite
+*.sqlite3
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

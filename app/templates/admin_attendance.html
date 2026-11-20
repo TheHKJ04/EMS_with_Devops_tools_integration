@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-semibold mb-1">Attendance Overview</h3>
+      <p class="text-muted mb-0">Search, filter, and review attendance records for every employee.</p>
+    </div>
+  </div>
+
+  <div class="card p-3 mb-4">
+    <form method="GET" class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label">Search</label>
+        <input type="text" class="form-control" name="search" value="{{ search_query }}" placeholder="Name, email, status, notes">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Department</label>
+        <select class="form-select" name="department">
+          <option value="">All</option>
+          {% for department in departments %}
+          <option value="{{ department }}" {% if department_filter == department %}selected{% endif %}>{{ department }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Status</label>
+        <select class="form-select" name="status">
+          <option value="">All</option>
+          {% for status in statuses %}
+          <option value="{{ status }}" {% if status_filter == status %}selected{% endif %}>{{ status }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">From</label>
+        <input type="date" class="form-control" name="start_date" value="{{ start_date }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">To</label>
+        <input type="date" class="form-control" name="end_date" value="{{ end_date }}">
+      </div>
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-primary w-100">Filter</button>
+      </div>
+      <div class="col-12">
+        <a href="/employee/admin/attendance" class="btn btn-outline-secondary btn-sm">Reset</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="card p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Records</h5>
+      <div class="d-flex gap-2 align-items-center">
+        <select class="form-select form-select-sm" onchange="location.href='?search={{ search_query }}&department={{ department_filter }}&status={{ status_filter }}&start_date={{ start_date }}&end_date={{ end_date }}&sort_by='+this.value+'&sort_order={{ sort_order }}'">
+          <option value="attendance_date" {% if sort_by == 'attendance_date' %}selected{% endif %}>Sort by Date</option>
+          <option value="employee_name" {% if sort_by == 'employee_name' %}selected{% endif %}>Sort by Employee</option>
+          <option value="status" {% if sort_by == 'status' %}selected{% endif %}>Sort by Status</option>
+        </select>
+        <select class="form-select form-select-sm" onchange="location.href='?search={{ search_query }}&department={{ department_filter }}&status={{ status_filter }}&start_date={{ start_date }}&end_date={{ end_date }}&sort_by={{ sort_by }}&sort_order='+this.value">
+          <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Descending</option>
+          <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Ascending</option>
+        </select>
+      </div>
+    </div>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in records %}
+        <tr>
+          <td>{{ record.employee.name }}<br><small>{{ record.employee.email }}</small></td>
+          <td>{{ record.attendance_date }}</td>
+          <td>{{ record.status }}</td>
+          <td>{{ record.notes or '-' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4">No attendance records found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

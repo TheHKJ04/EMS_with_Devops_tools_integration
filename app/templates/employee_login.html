@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-sm p-4 border-0">
+        <div class="text-center mb-4">
+          <h3 class="fw-semibold">Employee Portal</h3>
+          <p class="text-muted mb-0">Sign in to view your profile, apply for leave, and mark attendance.</p>
+        </div>
+        <form method="POST" action="/employee/login">
+          <input type="hidden" name="login_type" value="employee">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control form-control-lg" name="email" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control form-control-lg" name="password" required>
+          </div>
+          <button class="btn btn-dark w-100">Sign In</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

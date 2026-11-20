@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-card p-4 p-lg-5 mb-4">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <h1 class="display-6 fw-semibold">Welcome back, {{ session.get('user_name', 'there') }}.</h1>
+            <p class="lead text-white-50 mb-0">Manage people, roles, and growth with a calm, modern workspace designed for clarity.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+            <a href="/employee/list" class="btn btn-light">Open Employee Directory</a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 p-4">
+            <h5 class="fw-semibold">People at a glance</h5>
+            <p class="text-muted">Understand team structure instantly through improved employee insights and status tracking.</p>
+            <a href="/employee/list" class="btn btn-outline-dark">View Directory</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 p-4">
+            <h5 class="fw-semibold">Performance-ready records</h5>
+            <p class="text-muted">Track position, salary, joining date, and work status in one elegant place.</p>
+            <a href="/employee/add" class="btn btn-outline-dark">Add Employee</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 p-4">
+            <h5 class="fw-semibold">Secure access</h5>
+            <p class="text-muted">Use admin-only access to protect the directory with a secure, session-based sign-in.</p>
+            <a href="/login" class="btn btn-outline-dark">Go to Admin Login</a>
+            <a href="/employee/login" class="btn btn-outline-dark mt-2">Employee Portal</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
