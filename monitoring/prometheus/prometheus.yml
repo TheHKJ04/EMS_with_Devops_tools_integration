@@ -1,4 +1,4 @@
-global:
+﻿global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
@@ -27,3 +27,9 @@ scrape_configs:
         target_label: instance
       - target_label: __address__
         replacement: blackbox-exporter:9115
+
+  - job_name: cadvisor
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - cadvisor:8080

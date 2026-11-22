@@ -1,4 +1,4 @@
-services:
+﻿services:
   blackbox-exporter:
     image: prom/blackbox-exporter:v0.27.0
     container_name: ems-blackbox-exporter
@@ -12,6 +12,25 @@ services:
     networks:
       - ems-network
 
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: ems-cadvisor
+    restart: unless-stopped
+    privileged: true
+    command:
+      - "--docker_only=true"
+      - "--housekeeping_interval=15s"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    mem_limit: 256m
+    cpus: 0.25
+    networks:
+      - ems-network
   prometheus:
     image: prom/prometheus:v3.5.0
     container_name: ems-prometheus
