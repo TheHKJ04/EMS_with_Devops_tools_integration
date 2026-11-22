@@ -36,3 +36,4 @@ Thumbs.db
 
 # Local secrets, runtime files and test output
 *.log
+k8s/.env.secret
