@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ems-db-migration
+  namespace: ems
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 300
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migration
+          image: thehkj04/ems-devops:1
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for MySQL..."
+              python -c "import socket,time,sys; \
+              [(lambda s: (s.connect(('mysql',3306)),s.close()))(socket.create_connection(('mysql',3306),timeout=3)) for _ in range(1)]" \
+              || until python -c "import socket; s=socket.create_connection(('mysql',3306),timeout=3); s.close()"; do sleep 3; done
+              flask --app app.py db upgrade
+          envFrom:
+            - secretRef:
+                name: ems-app-secrets
+          env:
+            - name: DATABASE_URL
+              value: "mysql+pymysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@mysql:3306/$(MYSQL_DATABASE)?charset=utf8mb4"

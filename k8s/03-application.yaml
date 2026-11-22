@@ -1,0 +1,145 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ems-web
+  namespace: ems
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ems-web
+  template:
+    metadata:
+      labels:
+        app: ems-web
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 100
+        runAsGroup: 101
+        fsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+        - name: ems
+          image: thehkj04/ems-devops:1
+          imagePullPolicy: IfNotPresent
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+          ports:
+            - name: http
+              containerPort: 8000
+
+          env:
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: ems-app-secrets
+                  key: MYSQL_DATABASE
+
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ems-app-secrets
+                  key: MYSQL_USER
+
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ems-app-secrets
+                  key: MYSQL_PASSWORD
+
+            - name: FLASK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ems-app-secrets
+                  key: FLASK_SECRET_KEY
+
+            - name: ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: ems-app-secrets
+                  key: ADMIN_EMAIL
+
+            - name: ADMIN_PASSWORD_HASH
+              valueFrom:
+                secretKeyRef:
+                  name: ems-app-secrets
+                  key: ADMIN_PASSWORD_HASH
+
+            - name: DATABASE_URL
+              value: "mysql+pymysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@mysql:3306/$(MYSQL_DATABASE)?charset=utf8mb4"
+
+            - name: UPLOAD_FOLDER
+              value: /app/uploads
+
+          volumeMounts:
+            - name: ems-uploads
+              mountPath: /app/uploads
+
+            - name: ems-tmp
+              mountPath: /tmp
+
+          startupProbe:
+            httpGet:
+              path: /login
+              port: 8000
+            periodSeconds: 10
+            failureThreshold: 18
+
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 192Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+      volumes:
+        - name: ems-uploads
+          emptyDir: {}
+
+        - name: ems-tmp
+          emptyDir:
+            sizeLimit: 64Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ems-web
+  namespace: ems
+spec:
+  type: NodePort
+  selector:
+    app: ems-web
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      nodePort: 30080
