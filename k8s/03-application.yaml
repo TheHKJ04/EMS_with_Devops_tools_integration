@@ -24,8 +24,8 @@ spec:
 
       containers:
         - name: ems
-          image: thehkj04/ems-devops:1
-          imagePullPolicy: IfNotPresent
+          image: thehkj04/ems-devops:demo
+          imagePullPolicy: Always
 
           securityContext:
             allowPrivilegeEscalation: false
