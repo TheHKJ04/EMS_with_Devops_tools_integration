@@ -6,10 +6,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install Python dependencies separately to improve build caching.
+# Install patched packaging tools and application dependencies.
 COPY requirements.txt .
-RUN python -m pip install --upgrade pip \
-    && pip install -r requirements.txt
+RUN python -m pip install --upgrade "pip" "setuptools>=78.1.1" \
+    && python -m pip install -r requirements.txt
 
 # Copy application source.
 COPY . .
