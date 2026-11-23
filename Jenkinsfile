@@ -44,7 +44,7 @@ pipeline {
             }
         }
 
-        stage('Trivy Image Scan') {
+        stage('Trivy Image Scan - Report') {
             steps {
                 sh '''
                     docker run --rm \
@@ -52,7 +52,23 @@ pipeline {
                       aquasec/trivy:latest \
                       image \
                       --severity HIGH,CRITICAL \
+                      --ignore-unfixed \
                       --exit-code 0 \
+                      "$IMAGE_REPO:$BUILD_NUMBER"
+                '''
+            }
+        }
+
+        stage('Trivy Critical Gate') {
+            steps {
+                sh '''
+                    docker run --rm \
+                      -v /var/run/docker.sock:/var/run/docker.sock \
+                      aquasec/trivy:latest \
+                      image \
+                      --severity CRITICAL \
+                      --ignore-unfixed \
+                      --exit-code 1 \
                       "$IMAGE_REPO:$BUILD_NUMBER"
                 '''
             }
@@ -74,6 +90,10 @@ pipeline {
 
                         docker push "$IMAGE_REPO:$BUILD_NUMBER"
 
+                        # Stable demonstration tag consumed by the Kubernetes manifest.
+                        docker tag "$IMAGE_REPO:$BUILD_NUMBER" "$IMAGE_REPO:demo"
+                        docker push "$IMAGE_REPO:demo"
+
                         if [ "$BRANCH_NAME" = "main" ]; then
                             docker tag \
                               "$IMAGE_REPO:$BUILD_NUMBER" \
@@ -81,8 +101,6 @@ pipeline {
 
                             docker push "$IMAGE_REPO:latest"
                         fi
-
-                        docker logout
                     '''
                 }
             }
@@ -99,6 +117,7 @@ pipeline {
         }
 
         always {
+            sh 'docker logout || true'
             sh 'docker image prune -f || true'
         }
     }
