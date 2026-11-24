@@ -108,7 +108,6 @@ print("Critical vulnerability gate passed")
                 '''
             }
         }
-
         stage('Publish to Docker Hub') {
             steps {
                 withCredentials([
