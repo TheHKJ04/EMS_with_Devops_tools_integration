@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+    pollSCM('H/2 * * * *')
+    }
+
     options {
         skipDefaultCheckout(true)
         disableConcurrentBuilds()
@@ -44,36 +48,63 @@ pipeline {
             }
         }
 
-        stage('Trivy Image Scan - Report') {
+        stage('Trivy Image Scan') {
             steps {
                 sh '''
                     docker run --rm \
-                      -v /var/run/docker.sock:/var/run/docker.sock \
-                      aquasec/trivy:latest \
-                      image \
-                      --severity HIGH,CRITICAL \
-                      --ignore-unfixed \
-                      --exit-code 0 \
-                      "$IMAGE_REPO:$BUILD_NUMBER"
+                    -v /var/run/docker.sock:/var/run/docker.sock \
+                    -v trivy-cache:/root/.cache/ \
+                    aquasec/trivy:0.76.0 \
+                    image \
+                    --timeout 15m \
+                    --scanners vuln \
+                    --severity HIGH,CRITICAL \
+                    --ignore-unfixed \
+                    --exit-code 0 \
+                    --format json \
+                    "$IMAGE_REPO:$BUILD_NUMBER" \
+                    > trivy-image-report.json
                 '''
+
+                archiveArtifacts artifacts: 'trivy-image-report.json',
+                                fingerprint: true
             }
         }
 
         stage('Trivy Critical Gate') {
             steps {
                 sh '''
-                    docker run --rm \
-                      -v /var/run/docker.sock:/var/run/docker.sock \
-                      aquasec/trivy:latest \
-                      image \
-                      --severity CRITICAL \
-                      --ignore-unfixed \
-                      --exit-code 1 \
-                      "$IMAGE_REPO:$BUILD_NUMBER"
+                    python - <<'PY'
+        import json
+        import sys
+
+        with open("trivy-image-report.json", encoding="utf-8") as f:
+            report = json.load(f)
+        critical = []
+
+        for result in report.get("Results") or []:
+            for vuln in result.get("Vulnerabilities") or []:
+                if vuln.get("Severity") == "CRITICAL":
+                    critical.append({
+                        "id": vuln.get("VulnerabilityID"),
+                        "package": vuln.get("PkgName"),
+                        "installed": vuln.get("InstalledVersion"),
+                        "fixed": vuln.get("FixedVersion")
+                    })
+
+        print(f"Critical vulnerabilities found: {len(critical)}")
+
+        for item in critical:
+            print(item)
+
+        if critical:
+            sys.exit("CRITICAL vulnerability gate failed")
+
+        print("Critical vulnerability gate passed")
+        PY
                 '''
             }
         }
-
         stage('Publish to Docker Hub') {
             steps {
                 withCredentials([

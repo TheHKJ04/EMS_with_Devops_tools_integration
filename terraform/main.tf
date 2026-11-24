@@ -53,24 +53,24 @@ resource "aws_cloudwatch_dashboard" "ems_demo" {
       {
         type = "metric", x = 0, y = 0, width = 12, height = 6
         properties = {
-          title = "EC2 CPU utilization", view = "timeSeries"
-          region = var.aws_region, period = 300
+          title   = "EC2 CPU utilization", view = "timeSeries"
+          region  = var.aws_region, period = 300
           metrics = [["AWS/EC2", "CPUUtilization", "InstanceId", var.ec2_instance_id]]
         }
       },
       {
         type = "metric", x = 12, y = 0, width = 12, height = 6
         properties = {
-          title = "EC2 memory utilization", view = "timeSeries"
-          region = var.aws_region, period = 300
+          title   = "EC2 memory utilization", view = "timeSeries"
+          region  = var.aws_region, period = 300
           metrics = [["CWAgent", "mem_used_percent", "InstanceId", var.ec2_instance_id]]
         }
       },
       {
         type = "metric", x = 0, y = 6, width = 12, height = 6
         properties = {
-          title = "Root disk utilization", view = "timeSeries"
-          region = var.aws_region, period = 300
+          title   = "Root disk utilization", view = "timeSeries"
+          region  = var.aws_region, period = 300
           metrics = [["CWAgent", "disk_used_percent", "InstanceId", var.ec2_instance_id, "path", "/", "device", "nvme0n1p1", "fstype", "ext4"]]
         }
       }

@@ -8,7 +8,7 @@
              ],
     "timezone":  "browser",
     "schemaVersion":  41,
-    "version":  4,
+    "version":  6,
     "refresh":  "15s",
     "time":  {
                  "from":  "now-15m",
@@ -499,7 +499,7 @@
                                                                            "drawStyle":  "line",
                                                                            "fillOpacity":  15
                                                                        },
-                                                            "unit":  "bytes"
+                                                            "unit":  "Bps"
                                                         },
                                            "overrides":  [
 
@@ -510,12 +510,12 @@
                                            "legendFormat":  "{{name}}",
                                            "editorMode":  "code",
                                            "refId":  "A",
-                                           "expr":  "sum by (name) (container_fs_usage_bytes{image!=\"\",device!=\"\"})",
+                                           "expr":  "sum by (name) (rate(container_network_receive_bytes_total{image!=\"\"}[5m]))",
                                            "instant":  false,
                                            "range":  true
                                        }
                                    ],
-                       "title":  "Container Filesystem Usage",
+                       "title":  "Container Network Receive Rate",
                        "gridPos":  {
                                        "y":  28,
                                        "w":  12,

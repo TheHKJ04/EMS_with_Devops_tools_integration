@@ -9,10 +9,23 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 100
+        runAsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: migration
           image: thehkj04/ems-devops:1
           imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           command:
             - /bin/sh
             - -c
@@ -22,9 +35,16 @@ spec:
               [(lambda s: (s.connect(('mysql',3306)),s.close()))(socket.create_connection(('mysql',3306),timeout=3)) for _ in range(1)]" \
               || until python -c "import socket; s=socket.create_connection(('mysql',3306),timeout=3); s.close()"; do sleep 3; done
               flask --app app.py db upgrade
+          volumeMounts:
+            - name: migration-tmp
+              mountPath: /tmp
           envFrom:
             - secretRef:
                 name: ems-app-secrets
           env:
             - name: DATABASE_URL
               value: "mysql+pymysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@mysql:3306/$(MYSQL_DATABASE)?charset=utf8mb4"
+      volumes:
+        - name: migration-tmp
+          emptyDir:
+            sizeLimit: 64Mi
