@@ -71,40 +71,44 @@ pipeline {
             }
         }
 
+        
         stage('Trivy Critical Gate') {
             steps {
                 sh '''
-                    python - <<'PY'
-        import json
-        import sys
+                    docker run --rm -i \
+                      --entrypoint python \
+                      "$IMAGE_REPO:$BUILD_NUMBER" \
+                      -c '
+import json
+import sys
 
-        with open("trivy-image-report.json", encoding="utf-8") as f:
-            report = json.load(f)
-        critical = []
+report = json.load(sys.stdin)
+critical = []
 
-        for result in report.get("Results") or []:
-            for vuln in result.get("Vulnerabilities") or []:
-                if vuln.get("Severity") == "CRITICAL":
-                    critical.append({
-                        "id": vuln.get("VulnerabilityID"),
-                        "package": vuln.get("PkgName"),
-                        "installed": vuln.get("InstalledVersion"),
-                        "fixed": vuln.get("FixedVersion")
-                    })
+for result in report.get("Results") or []:
+    for vuln in result.get("Vulnerabilities") or []:
+        if vuln.get("Severity") == "CRITICAL":
+            critical.append({
+                "id": vuln.get("VulnerabilityID"),
+                "package": vuln.get("PkgName"),
+                "installed": vuln.get("InstalledVersion"),
+                "fixed": vuln.get("FixedVersion")
+            })
 
-        print(f"Critical vulnerabilities found: {len(critical)}")
+print(f"Critical vulnerabilities found: {len(critical)}")
 
-        for item in critical:
-            print(item)
+for item in critical:
+    print(item)
 
-        if critical:
-            sys.exit("CRITICAL vulnerability gate failed")
+if critical:
+    sys.exit("CRITICAL vulnerability gate failed")
 
-        print("Critical vulnerability gate passed")
-        PY
+print("Critical vulnerability gate passed")
+' < trivy-image-report.json
                 '''
             }
         }
+
         stage('Publish to Docker Hub') {
             steps {
                 withCredentials([
