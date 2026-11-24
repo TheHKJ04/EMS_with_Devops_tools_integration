@@ -12,10 +12,24 @@
         <li class="nav-item"><a class="nav-link" href="/employee/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
         <li class="nav-item"><a class="nav-link" href="/employee/admin/leave-requests"><i class="bi bi-calendar2-check"></i> Leave Review</a></li>
         <li class="nav-item"><a class="nav-link" href="/employee/admin/attendance"><i class="bi bi-journal-check"></i> Attendance</a></li>
-        <li class="nav-item"><a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+        <li class="nav-item">
+          <form method="POST" action="{{ url_for('auth.logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="nav-link border-0 bg-transparent">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+          </form>
+        </li>
         {% elif session.get('user_id') %}
         <li class="nav-item"><a class="nav-link active" href="/employee/portal"><i class="bi bi-person-circle"></i> Profile</a></li>
-        <li class="nav-item"><a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+        <li class="nav-item">
+          <form method="POST" action="{{ url_for('auth.logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="nav-link border-0 bg-transparent">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+          </form>
+        </li>
         {% else %}
         <li class="nav-item"><a class="nav-link" href="/login"><i class="bi bi-box-arrow-in-right"></i> Admin Login</a></li>
         <li class="nav-item"><a class="nav-link" href="/employee/login"><i class="bi bi-person-circle"></i> Employee Login</a></li>

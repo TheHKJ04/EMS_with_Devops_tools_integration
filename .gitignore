@@ -1,4 +1,4 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
 *.pyd
@@ -33,3 +33,12 @@ htmlcov/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local secrets, runtime files and test output
+*.log
+
+
+# Local Kubernetes secrets and backups
+k8s/.env.secret
+k8s/.env.secret.backup-*
+*.backup-*

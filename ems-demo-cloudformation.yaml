@@ -1,0 +1,181 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Academic demonstration infrastructure for the Employee Management System.
+  Reuses the existing default VPC and public subnet in ap-southeast-2.
+  Creates one Ubuntu EC2 instance, encrypted gp3 root volume, security group,
+  Systems Manager and CloudWatch instance role, and an Elastic IP.
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-014d80267e8e64073
+    Description: Existing default VPC in Sydney.
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0a895d4c8f6914792   
+    Description: Existing default public subnet in ap-southeast-2a.
+  InstanceType:
+    Type: String
+    Default: m7i-flex.large
+    AllowedValues:
+      - t3.small
+      - c7i-flex.large
+      - m7i-flex.large
+    Description: m7i-flex.large is the selected instance type for the existing EMS demonstration configuration.
+  RootVolumeSize:
+    Type: Number
+    Default: 30
+    MinValue: 20
+    MaxValue: 50
+    Description: Encrypted gp3 root volume size in GiB.
+  AllowedHttpCidr:
+    Type: String
+    Default: 0.0.0.0/0
+    AllowedPattern: '^(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}$'
+    Description: Public source range for the EMS web endpoint. Restrict further if practical.
+
+Resources:
+  EmsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Public web access only; administration through Systems Manager.
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - Description: HTTP for demonstration EMS access
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref AllowedHttpCidr
+      SecurityGroupEgress:
+        - Description: HTTP outbound for package and image downloads
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - Description: HTTPS outbound for secure package and image downloads
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: ems-demo-security-group
+        - Key: Project
+          Value: EMS-DevOps-Demo
+
+  EmsInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ems-demo-ec2-role-${AWS::AccountId}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+      Tags:
+        - Key: Project
+          Value: EMS-DevOps-Demo
+
+  EmsInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EmsInstanceRole
+
+  EmsDemoLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /ems/demo/ec2
+      RetentionInDays: 7
+      Tags:
+        - Key: Project
+          Value: EMS-DevOps-Demo
+
+  EmsInstance:
+    Type: AWS::EC2::Instance
+    DependsOn:
+      - EmsDemoLogGroup
+    Properties:
+      ImageId: ami-048c1a9eb63a67eed
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !Ref EmsInstanceProfile
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref EmsSecurityGroup
+      MetadataOptions:
+        HttpEndpoint: enabled
+        HttpTokens: required
+        HttpPutResponseHopLimit: 1
+      Monitoring: false
+      DisableApiTermination: false
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: !Ref RootVolumeSize
+            VolumeType: gp3
+            Encrypted: true
+            DeleteOnTermination: true
+      Tags:
+        - Key: Name
+          Value: ems-devops-demo
+        - Key: Project
+          Value: EMS-DevOps-Demo
+        - Key: Environment
+          Value: demonstration
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euxo pipefail
+          exec > >(tee /var/log/ems-demo-bootstrap.log | logger -t user-data -s 2>/dev/console) 2>&1
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update
+          apt-get install -y docker.io docker-compose-v2 curl jq unzip
+          systemctl enable --now docker
+          usermod -aG docker ubuntu
+          mkdir -p /opt/ems-demo
+          chown ubuntu:ubuntu /opt/ems-demo
+          printf 'EC2 bootstrap completed. Deploy EMS and Jenkins through the documented setup steps.\n' > /opt/ems-demo/BOOTSTRAP_STATUS.txt
+          systemctl is-active docker
+
+  EmsElasticIp:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: ems-devops-demo-eip
+        - Key: Project
+          Value: EMS-DevOps-Demo
+
+  EmsElasticIpAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !GetAtt EmsElasticIp.AllocationId
+      InstanceId: !Ref EmsInstance
+
+Outputs:
+  InstanceId:
+    Description: EC2 instance ID.
+    Value: !Ref EmsInstance
+  ElasticIp:
+    Description: Stable public IPv4 address for the demonstration endpoint.
+    Value: !Ref EmsElasticIp
+  ApplicationUrl:
+    Description: HTTP endpoint; becomes available after the application and reverse proxy are deployed.
+    Value: !Sub 'http://${EmsElasticIp}'
+  SecurityGroupId:
+    Description: Security group ID. Only TCP 80 is inbound.
+    Value: !Ref EmsSecurityGroup
+  CloudWatchLogGroup:
+    Description: Log group reserved for EC2 system and bootstrap logs; CloudWatch Agent setup is pending.
+    Value: !Ref EmsDemoLogGroup
+  InstanceRoleName:
+    Description: EC2 role used for Systems Manager and CloudWatch Agent.
+    Value: !Ref EmsInstanceRole

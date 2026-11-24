@@ -1,0 +1,741 @@
+{
+    "uid":  "ems-monitoring-v2",
+    "title":  "EMS - DevOps Monitoring",
+    "tags":  [
+                 "EMS",
+                 "DevOps",
+                 "Prometheus"
+             ],
+    "timezone":  "browser",
+    "schemaVersion":  41,
+    "version":  6,
+    "refresh":  "15s",
+    "time":  {
+                 "from":  "now-15m",
+                 "to":  "now"
+             },
+    "panels":  [
+                   {
+                       "id":  1,
+                       "title":  "EMS Availability",
+                       "type":  "stat",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "gridPos":  {
+                                       "h":  6,
+                                       "w":  6,
+                                       "x":  0,
+                                       "y":  0
+                                   },
+                       "targets":  [
+                                       {
+                                           "refId":  "A",
+                                           "expr":  "probe_success{job=\"ems-availability\"}",
+                                           "legendFormat":  "EMS login endpoint",
+                                           "editorMode":  "code",
+                                           "instant":  true,
+                                           "range":  false
+                                       }
+                                   ],
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "max":  1,
+                                                            "mappings":  [
+                                                                             {
+                                                                                 "type":  "value",
+                                                                                 "options":  {
+                                                                                                 "0":  {
+                                                                                                           "text":  "DOWN",
+                                                                                                           "color":  "red"
+                                                                                                       },
+                                                                                                 "1":  {
+                                                                                                           "text":  "UP",
+                                                                                                           "color":  "green"
+                                                                                                       }
+                                                                                             }
+                                                                             }
+                                                                         ],
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "steps":  [
+                                                                                             {
+                                                                                                 "color":  "red",
+                                                                                                 "value":  0
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "green",
+                                                                                                 "value":  1
+                                                                                             }
+                                                                                         ]
+                                                                           }
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "options":  {
+                                       "reduceOptions":  {
+                                                             "calcs":  [
+                                                                           "lastNotNull"
+                                                                       ],
+                                                             "fields":  "",
+                                                             "values":  false
+                                                         },
+                                       "colorMode":  "background",
+                                       "graphMode":  "area",
+                                       "textMode":  "auto",
+                                       "justifyMode":  "center"
+                                   }
+                   },
+                   {
+                       "id":  2,
+                       "title":  "EMS Response Time",
+                       "type":  "timeseries",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "gridPos":  {
+                                       "h":  8,
+                                       "w":  18,
+                                       "x":  6,
+                                       "y":  0
+                                   },
+                       "targets":  [
+                                       {
+                                           "refId":  "A",
+                                           "expr":  "probe_duration_seconds{job=\"ems-availability\"}",
+                                           "legendFormat":  "EMS response time",
+                                           "editorMode":  "code",
+                                           "instant":  false,
+                                           "range":  true
+                                       }
+                                   ],
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "unit":  "s",
+                                                            "min":  0
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "options":  {
+                                       "legend":  {
+                                                      "displayMode":  "list",
+                                                      "placement":  "bottom"
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "single"
+                                                   }
+                                   }
+                   },
+                   {
+                       "id":  3,
+                       "title":  "Prometheus Target Health",
+                       "type":  "timeseries",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "gridPos":  {
+                                       "h":  8,
+                                       "w":  12,
+                                       "x":  0,
+                                       "y":  8
+                                   },
+                       "targets":  [
+                                       {
+                                           "refId":  "A",
+                                           "expr":  "up",
+                                           "legendFormat":  "{{job}} - {{instance}}",
+                                           "editorMode":  "code",
+                                           "instant":  false,
+                                           "range":  true
+                                       }
+                                   ],
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "max":  1
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "options":  {
+                                       "legend":  {
+                                                      "displayMode":  "list",
+                                                      "placement":  "bottom"
+                                                  }
+                                   }
+                   },
+                   {
+                       "id":  4,
+                       "title":  "EMS Probe Success History",
+                       "type":  "timeseries",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "gridPos":  {
+                                       "h":  8,
+                                       "w":  12,
+                                       "x":  12,
+                                       "y":  8
+                                   },
+                       "targets":  [
+                                       {
+                                           "refId":  "A",
+                                           "expr":  "probe_success{job=\"ems-availability\"}",
+                                           "legendFormat":  "EMS availability",
+                                           "editorMode":  "code",
+                                           "instant":  false,
+                                           "range":  true
+                                       }
+                                   ],
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "max":  1
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "options":  {
+                                       "legend":  {
+                                                      "displayMode":  "list",
+                                                      "placement":  "bottom"
+                                                  }
+                                   }
+                   },
+                   {
+                       "id":  5,
+                       "title":  "Container CPU Usage",
+                       "description":  "CPU usage by container, expressed as percentage of one CPU core.",
+                       "type":  "timeseries",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "gridPos":  {
+                                       "y":  12,
+                                       "w":  12,
+                                       "x":  0,
+                                       "h":  8
+                                   },
+                       "targets":  [
+                                       {
+                                           "instant":  false,
+                                           "legendFormat":  "{{name}}",
+                                           "expr":  "sum by (name) (rate(container_cpu_usage_seconds_total{image!=\"\"}[5m])) * 100",
+                                           "refId":  "A"
+                                       }
+                                   ],
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "fillOpacity":  15,
+                                                                           "lineInterpolation":  "smooth",
+                                                                           "showPoints":  "never",
+                                                                           "drawStyle":  "line",
+                                                                           "lineWidth":  2
+                                                                       },
+                                                            "color":  {
+                                                                          "mode":  "palette-classic"
+                                                                      },
+                                                            "unit":  "percent"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "sort":  "desc",
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   },
+                   {
+                       "id":  6,
+                       "title":  "Container Memory Usage",
+                       "description":  "Current working-set memory by container.",
+                       "type":  "timeseries",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "gridPos":  {
+                                       "y":  12,
+                                       "w":  12,
+                                       "x":  12,
+                                       "h":  8
+                                   },
+                       "targets":  [
+                                       {
+                                           "instant":  false,
+                                           "legendFormat":  "{{name}}",
+                                           "expr":  "sum by (name) (container_memory_working_set_bytes{image!=\"\"})",
+                                           "refId":  "A"
+                                       }
+                                   ],
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "fillOpacity":  15,
+                                                                           "lineInterpolation":  "smooth",
+                                                                           "showPoints":  "never",
+                                                                           "drawStyle":  "line",
+                                                                           "lineWidth":  2
+                                                                       },
+                                                            "color":  {
+                                                                          "mode":  "palette-classic"
+                                                                      },
+                                                            "unit":  "bytes"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "sort":  "desc",
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   },
+                   {
+                       "id":  7,
+                       "title":  "Container Network Receive",
+                       "description":  "Incoming network throughput by container.",
+                       "type":  "timeseries",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "gridPos":  {
+                                       "y":  20,
+                                       "w":  12,
+                                       "x":  0,
+                                       "h":  8
+                                   },
+                       "targets":  [
+                                       {
+                                           "instant":  false,
+                                           "legendFormat":  "{{name}}",
+                                           "expr":  "sum by (name) (rate(container_network_receive_bytes_total{image!=\"\"}[5m]))",
+                                           "refId":  "A"
+                                       }
+                                   ],
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "fillOpacity":  15,
+                                                                           "lineInterpolation":  "smooth",
+                                                                           "showPoints":  "never",
+                                                                           "drawStyle":  "line",
+                                                                           "lineWidth":  2
+                                                                       },
+                                                            "color":  {
+                                                                          "mode":  "palette-classic"
+                                                                      },
+                                                            "unit":  "Bps"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "sort":  "desc",
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   },
+                   {
+                       "id":  8,
+                       "title":  "Container Network Transmit",
+                       "description":  "Outgoing network throughput by container.",
+                       "type":  "timeseries",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "gridPos":  {
+                                       "y":  20,
+                                       "w":  12,
+                                       "x":  12,
+                                       "h":  8
+                                   },
+                       "targets":  [
+                                       {
+                                           "instant":  false,
+                                           "legendFormat":  "{{name}}",
+                                           "expr":  "sum by (name) (rate(container_network_transmit_bytes_total{image!=\"\"}[5m]))",
+                                           "refId":  "A"
+                                       }
+                                   ],
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "fillOpacity":  15,
+                                                                           "lineInterpolation":  "smooth",
+                                                                           "showPoints":  "never",
+                                                                           "drawStyle":  "line",
+                                                                           "lineWidth":  2
+                                                                       },
+                                                            "color":  {
+                                                                          "mode":  "palette-classic"
+                                                                      },
+                                                            "unit":  "Bps"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "sort":  "desc",
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   },
+                   {
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "sort":  "desc",
+                                                       "mode":  "multi"
+                                                   }
+                                   },
+                       "id":  9,
+                       "type":  "timeseries",
+                       "description":  "Resident memory currently used by each container.",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "lineInterpolation":  "smooth",
+                                                                           "lineWidth":  2,
+                                                                           "showPoints":  "never",
+                                                                           "drawStyle":  "line",
+                                                                           "fillOpacity":  15
+                                                                       },
+                                                            "unit":  "bytes"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{name}}",
+                                           "editorMode":  "code",
+                                           "refId":  "A",
+                                           "expr":  "sum by (name) (container_memory_rss{image!=\"\"})",
+                                           "instant":  false,
+                                           "range":  true
+                                       }
+                                   ],
+                       "title":  "Container Memory RSS",
+                       "gridPos":  {
+                                       "y":  28,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  0
+                                   }
+                   },
+                   {
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "sort":  "desc",
+                                                       "mode":  "multi"
+                                                   }
+                                   },
+                       "id":  10,
+                       "type":  "timeseries",
+                       "description":  "Filesystem usage reported by cAdvisor for each container.",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "lineInterpolation":  "smooth",
+                                                                           "lineWidth":  2,
+                                                                           "showPoints":  "never",
+                                                                           "drawStyle":  "line",
+                                                                           "fillOpacity":  15
+                                                                       },
+                                                            "unit":  "Bps"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{name}}",
+                                           "editorMode":  "code",
+                                           "refId":  "A",
+                                           "expr":  "sum by (name) (rate(container_network_receive_bytes_total{image!=\"\"}[5m]))",
+                                           "instant":  false,
+                                           "range":  true
+                                       }
+                                   ],
+                       "title":  "Container Network Receive Rate",
+                       "gridPos":  {
+                                       "y":  28,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  12
+                                   }
+                   },
+                   {
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "sort":  "desc",
+                                                       "mode":  "multi"
+                                                   }
+                                   },
+                       "id":  11,
+                       "type":  "timeseries",
+                       "description":  "Bytes read per second by each container.",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "lineInterpolation":  "smooth",
+                                                                           "lineWidth":  2,
+                                                                           "showPoints":  "never",
+                                                                           "drawStyle":  "line",
+                                                                           "fillOpacity":  15
+                                                                       },
+                                                            "unit":  "Bps"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{name}}",
+                                           "editorMode":  "code",
+                                           "refId":  "A",
+                                           "expr":  "sum by (name) (rate(container_fs_reads_bytes_total{image!=\"\",device!=\"\"}[5m]))",
+                                           "instant":  false,
+                                           "range":  true
+                                       }
+                                   ],
+                       "title":  "Container Disk Read Throughput",
+                       "gridPos":  {
+                                       "y":  36,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  0
+                                   }
+                   },
+                   {
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "sort":  "desc",
+                                                       "mode":  "multi"
+                                                   }
+                                   },
+                       "id":  12,
+                       "type":  "timeseries",
+                       "description":  "Bytes written per second by each container.",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "lineInterpolation":  "smooth",
+                                                                           "lineWidth":  2,
+                                                                           "showPoints":  "never",
+                                                                           "drawStyle":  "line",
+                                                                           "fillOpacity":  15
+                                                                       },
+                                                            "unit":  "Bps"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{name}}",
+                                           "editorMode":  "code",
+                                           "refId":  "A",
+                                           "expr":  "sum by (name) (rate(container_fs_writes_bytes_total{image!=\"\",device!=\"\"}[5m]))",
+                                           "instant":  false,
+                                           "range":  true
+                                       }
+                                   ],
+                       "title":  "Container Disk Write Throughput",
+                       "gridPos":  {
+                                       "y":  36,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  12
+                                   }
+                   },
+                   {
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "sort":  "desc",
+                                                       "mode":  "multi"
+                                                   }
+                                   },
+                       "id":  13,
+                       "type":  "timeseries",
+                       "description":  "Percentage of CPU scheduling periods in which containers were throttled.",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "lineInterpolation":  "smooth",
+                                                                           "lineWidth":  2,
+                                                                           "showPoints":  "never",
+                                                                           "drawStyle":  "line",
+                                                                           "fillOpacity":  15
+                                                                       },
+                                                            "unit":  "percent"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{name}}",
+                                           "editorMode":  "code",
+                                           "refId":  "A",
+                                           "expr":  "100 * sum by (name) (rate(container_cpu_cfs_throttled_periods_total{image!=\"\"}[5m])) / clamp_min(sum by (name) (rate(container_cpu_cfs_periods_total{image!=\"\"}[5m])), 1)",
+                                           "instant":  false,
+                                           "range":  true
+                                       }
+                                   ],
+                       "title":  "Container CPU Throttling",
+                       "gridPos":  {
+                                       "y":  44,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  0
+                                   }
+                   },
+                   {
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "sort":  "desc",
+                                                       "mode":  "multi"
+                                                   }
+                                   },
+                       "id":  14,
+                       "type":  "timeseries",
+                       "description":  "Receive and transmit network errors reported by cAdvisor.",
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "prometheus-ems"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "unit":  "ops"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{name}} - Receive",
+                                           "editorMode":  "code",
+                                           "refId":  "A",
+                                           "expr":  "sum by (name) (rate(container_network_receive_errors_total{image!=\"\"}[5m]))",
+                                           "instant":  false,
+                                           "range":  true
+                                       },
+                                       {
+                                           "legendFormat":  "{{name}} - Transmit",
+                                           "editorMode":  "code",
+                                           "refId":  "B",
+                                           "expr":  "sum by (name) (rate(container_network_transmit_errors_total{image!=\"\"}[5m]))",
+                                           "instant":  false,
+                                           "range":  true
+                                       }
+                                   ],
+                       "title":  "Container Network Errors",
+                       "gridPos":  {
+                                       "y":  44,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  12
+                                   }
+                   }
+               ],
+    "annotations":  {
+                        "list":  [
+
+                                 ]
+                    },
+    "links":  [
+
+              ]
+}
